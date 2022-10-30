@@ -16,5 +16,5 @@ module.exports = async ({
     })
     const resJson = await res.json()
 
-    return { ...resJson.data.rates }
+    return { ...resJson.rates }
 }
