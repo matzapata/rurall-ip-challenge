@@ -2,12 +2,12 @@ const ipData = require("../domain/ipData");
 const IpEntity = require("../entities/Ip")
 
 // mock interfaces functions
-const getIpCountryData = jest.fn(ip => ({
+const getIpCountryData = jest.fn(ipAddress => ({
     code: "ARS",
     name: "Argentina",
     currency: "ARS"
 }))
-const getCurrencyValuation = jest.fn(curr => ({ USD: 1.2, EUR: 1.5 }))
+const getCurrencyValuation = jest.fn(baseCurrency => ({ USD: 1.2, EUR: 1.5 }))
 
 describe("IP data", () => {
 
@@ -23,7 +23,7 @@ describe("IP data", () => {
         expect(invalidIp.validate()).toBe(false)
     })
     it('Should throw error when IP is invalid', async () => {
-        return ipData({ getIpCountryData, getCurrencyValuation }, { ip: "invalidIp" })
+        return ipData({ getIpCountryData, getCurrencyValuation }, { ipAddress: "invalidIp" })
             .then(() => expect(true).toBe(false)) // Fail test if above expression doesn't throw anything.
             .catch((e) => {
                 expect(e?.message).toBe("Invalid IP")
@@ -33,7 +33,7 @@ describe("IP data", () => {
     })
     it('Should respond with ip country name, ISO, and currency valuation', async () => {
         const ipAddress = "192.168.0.1";
-        return ipData({ getIpCountryData, getCurrencyValuation }, { ip: ipAddress })
+        return ipData({ getIpCountryData, getCurrencyValuation }, { ipAddress })
             .then((res) => {
                 expect(typeof res?.name).toBe("string")
                 expect(typeof res?.code).toBe("string")
