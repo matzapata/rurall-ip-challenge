@@ -1,23 +1,50 @@
 const fetch = require("cross-fetch")
 require("dotenv").config()
+const redisClient = require("../data/redisClient");
 
-module.exports = async (ipAddress) => {
+const getIpCountryCode = async (ipAddress) => {
+    // If available fetch data from cache
+    const countryCode = await redisClient.GET(`ipCountryCode:${ipAddress}`)
+    if (countryCode !== null) return countryCode; 
+
+    // Data is not in cache, fetch from api and store to cache 
     const resCountryCode = await fetch(`http://api.ipapi.com/api/${ipAddress}?access_key=${process.env.IPAPI_API_KEY}`, {
         method: 'GET',
         redirect: 'follow'
     })
     const resCountryCodeJson = await resCountryCode.json()
+    await redisClient.SET(`ipCountryCode:${ipAddress}`, resCountryCodeJson.country_code)
     
-    const resCountryData = await fetch(`https://restcountries.com/v3.1/alpha/${resCountryCodeJson.country_code}`, {
+    return resCountryCodeJson.country_code;
+}
+
+const getCountryNameAndCurrency =  async (countryCode) => {
+    // If available fetch data from cache
+    let countryData = await redisClient.GET(`countryData:${countryCode}`);
+    if (countryData !== null) return JSON.parse(countryData);
+
+    // Data is not in cache, fetch from api and store to cache 
+    const resCountryData = await fetch(`https://restcountries.com/v3.1/alpha/${countryCode}`, {
         method: 'GET',
         redirect: 'follow'
     })
     const resCountryDataJson = await resCountryData.json()
-    const countryData = resCountryDataJson[0]
+    countryData = {
+        name: resCountryDataJson[0].name.official,
+        currency: Object.keys(resCountryDataJson[0].currencies)[0]
+    }
+    await redisClient.SET(`countryData:${countryCode}`, JSON.stringify(countryData))
+    
+    return countryData;
+}
+
+module.exports = async (ipAddress) => {
+    const countryCode = await getIpCountryCode(ipAddress)
+    const countryNameAndCurrency = await getCountryNameAndCurrency(countryCode)
 
     return {
-        code: resCountryCodeJson.country_code,
-        name: countryData.name.official,
-        currency: Object.keys(countryData.currencies)[0]
+        code: countryCode,
+        name: countryNameAndCurrency.name,
+        currency: countryNameAndCurrency.currency
     }
 }

@@ -1,10 +1,10 @@
 const server = require('./server');
 require('dotenv').config()
+const redisClient = require("./data/redisClient")
 
-server.listen(process.env.PORT, () => {
-    console.log(`Server running on  http://localhost:${process.env.PORT}`)
-});
-
-server.on('error', err => {
-    console.error(err);
-});
+redisClient.connect()
+    .then(() => {
+        server.listen(process.env.PORT, () => {
+            console.log(`Server running on  http://localhost:${process.env.PORT}`)
+        });
+    })

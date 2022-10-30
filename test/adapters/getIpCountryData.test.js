@@ -1,8 +1,18 @@
 const getIpCountryData = require("../../adapters/getIpCountryData")
+const redisClient = require("../../data/redisClient")
 const nock = require("nock")
 require("dotenv").config()
 
 describe('Get ip country data', () => {
+
+    beforeAll(async () => {
+        await redisClient.connect()
+	})
+
+    afterAll(async () => {
+		await redisClient.disconnect()
+	})
+
     it("Given an ip it should respond with the ip country code, name and currency", () => {
         const testIpAddress = "161.185.160.93"
         const testIpAddressCountryCode = "US"

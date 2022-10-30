@@ -1,8 +1,18 @@
 const getCurrencyValuation = require("../../adapters/getCurrencyValuation")
 const nock = require("nock");
 const todayDate = require("../../utils/todayDate");
+const redisClient = require("../../data/redisClient")
 
 describe('Get currency valuation', () => {
+    
+    beforeAll(async () => {
+        await redisClient.connect()
+	})
+
+    afterAll(async () => {
+		await redisClient.disconnect()
+	})
+
     it("Should return symbols rates", () => {
         const date = "2022-10-30";
         const symbols = ["USD", "EUR"]
