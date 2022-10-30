@@ -7,7 +7,7 @@ describe('Ban/Blacklist IPs', () => {
 
         isIpBanned({ getBannedIpByValue }, { ipAddress })
             .then(res => expect(res).toBe(true))
-            .then(() => expect(true).toBe(false)) // Should not throw errors
+            .catch(() => expect(true).toBe(false)) // Should not throw errors
     })
     it("isIpBanned should return false if ip is not banned", () => {
         const ipAddress = "192.0.1";
@@ -15,7 +15,7 @@ describe('Ban/Blacklist IPs', () => {
 
         isIpBanned({ getBannedIpByValue }, { ipAddress })
             .then(res => expect(res).toBe(false))
-            .then(() => expect(true).toBe(false)) // Should not throw errors
+            .catch(() => expect(true).toBe(false)) // Should not throw errors
     })
 })
 

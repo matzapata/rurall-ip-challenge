@@ -5,7 +5,7 @@ module.exports = async ({ getIpCountryData, getCurrencyValuation }, { ipAddress 
     if (Ip.validate() === false) throw new Error("Invalid IP");
 
     const { code, name, currency } = await getIpCountryData(ipAddress);
-    const { USD, EUR } = await getCurrencyValuation(currency)
+    const { USD, EUR } = await getCurrencyValuation({ base: currency, symbols: ["USD", "EUR"] })
 
     return {
         code,

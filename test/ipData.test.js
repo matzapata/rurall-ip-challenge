@@ -7,7 +7,7 @@ const getIpCountryData = jest.fn(ipAddress => ({
     name: "Argentina",
     currency: "ARS"
 }))
-const getCurrencyValuation = jest.fn(baseCurrency => ({ USD: 1.2, EUR: 1.5 }))
+const getCurrencyValuation = jest.fn(({ base, symbols, date }) => ({ USD: 1.2, EUR: 1.5 }))
 
 describe("IP data", () => {
 
@@ -44,7 +44,7 @@ describe("IP data", () => {
 
                 // Interfaces must be used to resolve data
                 expect(getIpCountryData).toHaveBeenCalledWith(ipAddress)
-                expect(getCurrencyValuation).toHaveBeenCalledWith("ARS")
+                expect(getCurrencyValuation).toHaveBeenCalledWith({ base: "ARS", symbols: ["USD", "EUR"] })
             })
     })
 })
