@@ -1,7 +1,9 @@
-const apiServices = require('../controller/index');
+const express = require('express');
+const bannedIpsMiddleware = require('../middlewares/bannedIpsMiddleware');
+const router = express.Router();
 
-const routers = (app) =>{
-    app.use('/api/v1',apiServices);
-};
+router.get("/ip-country-data/:ip", bannedIpsMiddleware, (req, res) => {
+    return res.status(200).send("OK")
+})
 
-module.exports = routers;
+module.exports = router;
