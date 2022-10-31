@@ -19,6 +19,72 @@ Express server that follows the hexagonal software architecture to:
 
 ## Docker run
 
-1. Build docker image with `docker build -t rurall-ip-challenge .`
+1. Build docker and run docker containers `docker-compose up --build`
 
-2. Create container and run it with `docker run --name rurall-ip-challenge-container -p 3000:3000 rurall-ip-challenge`. Here the `-p 3000:3000` it's important to connect the exposed container port to the local machine port for development porpouses. So make sure it's updated with the `.env` file and the `dockerfile`.
+# Api endpoints
+
+## `GET /ip-country-data/:ip`
+
+Route protected with the `bannedIpsMiddleware` that searches the ips blacklists and if banned responds with `403 "Request ip is banned"`
+
+Example success response (status 200): 
+
+```json
+{
+    "message": "Successfully looked up ip data",
+    "data": {
+        "code": "US",
+        "name": "United States of America",
+        "currency": "USD",
+        "currencyRates": {
+            "USD": 1,
+            "EUR": 1.004855
+        }
+    }
+}
+```
+
+
+Example error response (status 500): 
+
+```json
+{
+    "message": "Error message",
+}
+```
+
+# Adapters implementations
+
+## `getBannedIpByValue`
+
+Finds ip in `data/bannedIps.json` and returns found object
+
+## `getCurrencyValuation`
+
+Fetch currency valuation from `https://api.apilayer.com/fixer`. Requires `FIXER_API_KEY` in `.env`
+If possible gets data from redis cache
+
+```js
+async getCurrencyValuation({
+    base, // Base currency symbol to convert from
+    symbols, // Array of currency symbols to convert to 
+    date // A date in the past for which historical rates are requested (as string formated like yyyy-mm-dd). Default today.
+}) => { ...symbols: rates }
+```
+
+## `getIpCountryData`
+
+Fetch country code from `http://api.ipapi.com`
+Fetch country name and currency from `https://restcountries.com`
+If available get data from cache
+
+```js
+async (ipAddress) => {
+    return {
+        code: "countryCode",
+        name: "countryName",
+        currency: "currencyCode"
+    }
+}
+```
+
