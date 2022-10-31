@@ -6,11 +6,25 @@ services:
       - 6379
   node-app:
     build: ./api
+    environment:
+      - CHOKIDAR_USEPOLLING=true
     depends_on:
       - redis
     ports:
       - "8000:8000"
+    volumes:
+      - ./api:/usr/src/app/api
+      - /usr/src/app/api/node_modules
   react-app:
     build: ./client
+    environment:
+      - CHOKIDAR_USEPOLLING=true 
+      - WATCHPACK_POLLING=true 
+      - FAST_REFRESH=false
+      - WDS_SOCKET_PORT=30000 
     ports:
       - "3000:3000"
+    volumes:
+      - ./client:/usr/src/app/client
+      - /usr/src/app/client/node_modules
+  
