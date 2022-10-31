@@ -5,7 +5,7 @@ services:
     expose:
       - 6379
   node-app:
-    build: .
+    build: ./api
     depends_on:
       - redis
     ports:
