@@ -9,4 +9,8 @@ services:
     depends_on:
       - redis
     ports:
+      - "8000:8000"
+  react-app:
+    build: ./client
+    ports:
       - "3000:3000"
