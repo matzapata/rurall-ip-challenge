@@ -1,10 +1,10 @@
 const fetch = require("cross-fetch")
 require("dotenv").config()
-const redisClient = require("../data/redisClient");
+const { cache } = require("../data/redis");
 
 const getIpCountryCode = async (ipAddress) => {
     // If available fetch data from cache
-    const countryCode = await redisClient.GET(`ipCountryCode:${ipAddress}`)
+    const countryCode = await cache.GET(`ipCountryCode:${ipAddress}`)
     if (countryCode !== null) return countryCode; 
 
     // Data is not in cache, fetch from api and store to cache 
@@ -13,14 +13,14 @@ const getIpCountryCode = async (ipAddress) => {
         redirect: 'follow'
     })
     const resCountryCodeJson = await resCountryCode.json()
-    await redisClient.SET(`ipCountryCode:${ipAddress}`, resCountryCodeJson.country_code)
+    await cache.SET(`ipCountryCode:${ipAddress}`, resCountryCodeJson.country_code)
     
     return resCountryCodeJson.country_code;
 }
 
 const getCountryNameAndCurrency =  async (countryCode) => {
     // If available fetch data from cache
-    let countryData = await redisClient.GET(`countryData:${countryCode}`);
+    let countryData = await cache.GET(`countryData:${countryCode}`);
     if (countryData !== null) return JSON.parse(countryData);
 
     // Data is not in cache, fetch from api and store to cache 
@@ -33,7 +33,7 @@ const getCountryNameAndCurrency =  async (countryCode) => {
         name: resCountryDataJson[0].name.official,
         currency: Object.keys(resCountryDataJson[0].currencies)[0]
     }
-    await redisClient.SET(`countryData:${countryCode}`, JSON.stringify(countryData))
+    await cache.SET(`countryData:${countryCode}`, JSON.stringify(countryData))
     
     return countryData;
 }

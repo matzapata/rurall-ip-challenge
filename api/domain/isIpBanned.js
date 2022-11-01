@@ -1,6 +1,9 @@
 
 
-module.exports = async ({ getBannedIpByValue }, { ipAddress }) => {
-    const foundIp = await getBannedIpByValue(ipAddress);
-    return foundIp !== undefined? true : false;
+module.exports = async ({ getIpByValue, setIp }, { ipAddress }) => {
+    const foundIp = await getIpByValue(ipAddress);
+    if (foundIp === null) {
+        await setIp(ipAddress, false)
+        return false;
+    } else return foundIp.isBanned;
 }

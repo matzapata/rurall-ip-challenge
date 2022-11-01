@@ -1,17 +1,17 @@
 const getIpCountryData = require("../../adapters/getIpCountryData")
-const redisClient = require("../../data/redisClient")
+const { cache } = require("../../data/redis")
 const nock = require("nock")
 require("dotenv").config()
 
 describe('Get ip country data', () => {
 
     beforeAll(async () => {
-        await redisClient.connect()
-	})
+        await cache.connect()
+    })
 
     afterAll(async () => {
-		await redisClient.disconnect()
-	})
+        await cache.disconnect()
+    })
 
     it("Given an ip it should respond with the ip country code, name and currency", () => {
         const testIpAddress = "161.185.160.93"
@@ -55,13 +55,13 @@ describe('Get ip country data', () => {
             ])
 
 
-            return getIpCountryData(testIpAddress)
-                .then((res) => {
-                    expect(res.code).toBe(testIpAddressCountryCode) 
-                    expect(res.name).toBe(testIpAddressCountryName) 
-                    expect(res.currency).toBe(testIpAddressCurrency) 
-                })
-                .catch(e => expect(true).toEqual(false))
+        return getIpCountryData(testIpAddress)
+            .then((res) => {
+                expect(res.code).toBe(testIpAddressCountryCode)
+                expect(res.name).toBe(testIpAddressCountryName)
+                expect(res.currency).toBe(testIpAddressCurrency)
+            })
+            .catch(e => expect(true).toEqual(false))
 
     })
 })

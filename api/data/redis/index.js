@@ -4,4 +4,6 @@ const redisClient = Redis.createClient({
     url: process.env.REDIS_URL
 })
 
-module.exports = redisClient;
+module.exports = {
+    cache: redisClient
+};

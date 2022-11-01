@@ -1,10 +1,11 @@
 const isIpBanned = require("../domain/isIpBanned")
-const getBannedIpByValue = require("../adapters/getBannedIpByValue")
+const getIpByValue = require("../adapters/getIpByValue")
+const setIp = require("../adapters/setIp")
 
 module.exports = async (req, res, next) => {
     const ipAddress = req.ip;
 
-    if (await isIpBanned({ getBannedIpByValue }, { ipAddress }) === true) 
+    if (await isIpBanned({ getIpByValue, setIp }, { ipAddress }) === true) 
         return res.status(403).send("Request ip is banned")
     else next();
 }

@@ -4,12 +4,23 @@ services:
     image: 'redis'
     expose:
       - 6379
+  pg:
+    image: postgres:14.1-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - '5432:5432'
+    volumes: 
+      - data:/var/lib/postgresql/data
   node-app:
     build: ./api
     environment:
       - CHOKIDAR_USEPOLLING=true
     depends_on:
       - redis
+      - pg
     ports:
       - "8000:8000"
     volumes:
@@ -28,3 +39,5 @@ services:
       - ./client:/usr/src/app/client
       - /usr/src/app/client/node_modules
   
+volumes:
+  data:
