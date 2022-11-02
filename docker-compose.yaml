@@ -8,10 +8,11 @@ services:
     image: postgres:14.1-alpine
     restart: always
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-    ports:
-      - '5432:5432'
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=user
+      - POSTGRES_DB=rurall-ip-challenge
+    expose:
+      - 5432
     volumes: 
       - data:/var/lib/postgresql/data
   node-app:

@@ -1,6 +1,7 @@
 const { Sequelize, DataTypes } = require('sequelize');
+require("dotenv").config()
 
-const db = new Sequelize("postgres://postgres:postgres@pg:5432/ips-database");
+const db = new Sequelize(process.env.PG_URI);
 
 const Ips = db.define('Ips', {
     address: {
