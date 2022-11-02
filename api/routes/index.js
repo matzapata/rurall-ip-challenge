@@ -6,6 +6,7 @@ const ipData = require("../domain/ipData")
 const getIpCountryData = require("../adapters/getIpCountryData")
 const getCurrencyValuation = require("../adapters/getCurrencyValuation");
 const setIp = require('../adapters/setIp');
+const IpEntity = require('../entities/Ip');
 
 router.get("/ip-country-data/:ip", bannedIpsMiddleware, async (req, res) => {
     try {
@@ -22,8 +23,12 @@ router.get("/ip-country-data/:ip", bannedIpsMiddleware, async (req, res) => {
 })
 
 router.post("/ip-blacklist", async (req, res) => {
-    try {
-        const ipAddress = req.body.ipAddress
+    const ipAddress = req.body.ipAddress
+    const ip = new IpEntity(ipAddress);
+    if (!ip.validate()) return res.status(400).send("Invalid ip")
+    
+    try {    
+
         await setIp(ipAddress, true);
         return res.status(200).send({ message: "OK" })
     } catch (e) {

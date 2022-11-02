@@ -53,11 +53,61 @@ Example error response (status 500):
 }
 ```
 
+## `POST /ip-blackslist`
+
+Adds an ip to the blacklist:
+
+Body
+
+```json
+{
+    ipAddress: "..."
+}
+```
+
+Success response (status 200)
+
+```json
+{
+    "message": "OK"
+}
+```
+
+Invalid IP response (status 400)
+
+```json
+{
+    "message": "Invalid IP"
+}
+```
+
+Error response (status 500)
+
+```json
+{
+    "message": "...error.message"
+}
+```
+
 # Adapters implementations
 
-## `getBannedIpByValue`
+## `getIpByValue`
 
-Finds ip in `data/bannedIps.json` and returns found object
+Finds ip in cache or database and retrieves it's instance if found or null if not
+
+example: 
+
+```
+{ id: 1, address: "...", is_banned: false }
+```
+
+## `setIp`
+
+Stores ip in cache and database as follows:
+
+```
+{ id: 1, address: "...", is_banned: false }
+```
 
 ## `getCurrencyValuation`
 
@@ -87,4 +137,10 @@ async (ipAddress) => {
     }
 }
 ```
+
+# Middlewares
+
+## bannedIpsMiddleware
+
+Uses `getIpByValue` to find ips data and if the `is_banned` field is set tu true, responds with `res.status(403).send({ message: "Request ip is banned" })`
 
