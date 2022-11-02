@@ -9,17 +9,18 @@ Express server that follows the hexagonal software architecture to:
 
 ## Development setup steps
 
-1. Setup enviroment variables. Copy `.env.example` to `.env` and fill the enviroment variables with it's corresponding values. Note that if you change the `PORT` default value, you'll have to update it in the `dockerfile` as well.
+1. Setup enviroment variables. Copy `.env.example` to `.env` and fill the enviroment variables with it's corresponding values. Note that if you change the `PORT` default value, you'll have to update it in the `dockerfile` as well. Also create postgres and redis db instances.
 
-2. Install dependencies with: `npm install` or `yarn`
+2. Install dependencies with: `npm install` or `yarn` in both client and server
 
-3. Start development server with `npm run start` or `yarn start`
+3. Start development server with `npm run start` or `yarn start` in both client and server
 
-> Run tests with `npm run test` or `yarn test`
+> Run api tests with `npm run test` or `yarn test`
 
 ## Docker run
 
 1. Build docker and run docker containers `docker-compose up --build`
+2. In the docker node-app terminal run `npm run migrate` and `npm run seed` to migrate and seed the ips database
 
 # Api endpoints
 
