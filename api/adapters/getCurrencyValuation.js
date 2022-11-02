@@ -1,7 +1,7 @@
 require('dotenv').config()
 const todayDate = require("../utils/todayDate")
 const fetch = require('cross-fetch');
-const { cache } = require("../data/redis")
+const { cache, cacheGetCurrencyRates, cacheSetCurrencyRates } = require("../data/redis")
 
 const CURRENCY_VALUATION_CACHE_LIFETIME = 60*60
 
@@ -11,8 +11,8 @@ module.exports = async ({
     date // A date in the past for which historical rates are requested (as string formated like yyyy-mm-dd). Default today.
 }) => {
     // If available fetch data from cache
-    let currencyRates = await cache.GET(`currencyRates:${base}:${symbols}:${date}`);
-    if (currencyRates !== null) return JSON.parse(currencyRates);
+    let currencyRates = await cacheGetCurrencyRates({ base, symbols, date })
+    if (currencyRates !== null) return currencyRates;
 
     // Data is not in cache, fetch from api and store to cache 
     const res = await fetch(`https://api.apilayer.com/fixer/${date === undefined ? todayDate() : date}?symbols=${symbols.join("%2C")}&base=${base}`, {
@@ -24,7 +24,7 @@ module.exports = async ({
     })
     const resJson = await res.json()
     currencyRates = { ...resJson.rates }
-    await cache.SETEX(`currencyRates:${base}:${symbols}:${date}`, CURRENCY_VALUATION_CACHE_LIFETIME, JSON.stringify(currencyRates))
+    await cacheSetCurrencyRates({ base, symbols, date, currencyRates })
 
     return currencyRates; 
 }

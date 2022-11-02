@@ -1,6 +1,6 @@
 const fetch = require("cross-fetch")
 require("dotenv").config()
-const { cache } = require("../data/redis");
+const { cache, cacheGetIpCountryData, cacheSetIpCountryData } = require("../data/redis");
 
 const getIpCountryCode = async (ipAddress) => {
     // If available fetch data from cache
@@ -20,8 +20,8 @@ const getIpCountryCode = async (ipAddress) => {
 
 const getCountryNameAndCurrency =  async (countryCode) => {
     // If available fetch data from cache
-    let countryData = await cache.GET(`countryData:${countryCode}`);
-    if (countryData !== null) return JSON.parse(countryData);
+    let countryData = await cacheGetIpCountryData({ countryCode })
+    if (countryData !== null) return countryData;
 
     // Data is not in cache, fetch from api and store to cache 
     const resCountryData = await fetch(`https://restcountries.com/v3.1/alpha/${countryCode}`, {
@@ -33,7 +33,7 @@ const getCountryNameAndCurrency =  async (countryCode) => {
         name: resCountryDataJson[0].name.official,
         currency: Object.keys(resCountryDataJson[0].currencies)[0]
     }
-    await cache.SET(`countryData:${countryCode}`, JSON.stringify(countryData))
+    await cacheSetIpCountryData({ countryCode, countryData })
     
     return countryData;
 }
