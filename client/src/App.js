@@ -7,14 +7,15 @@ import validateIp from "./utils/validateIp"
 function App() {
   const [ipData, setIpData] = useState(null)
   const [search, setSearch] = useState("")
-  const [loading, setLoading] = useState(false);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [banLoading, setBanLoading] = useState(false);
 
   const onSearch = async (e) => {
     e.preventDefault()
     if (!validateIp(search)) return alert("Invalid IP address")
 
     try {
-      setLoading(true);
+      setSearchLoading(true);
       const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/ip-country-data/${search}`)
       setIpData({
         address: search,
@@ -23,9 +24,23 @@ function App() {
     } catch (e) {
       alert(`Error: ${e.message}`)
     } finally {
-      setLoading(false)
+      setSearchLoading(false)
     }
   }
+
+  const onBanIp = async () => {
+    if (!validateIp(search)) return alert("Invalid IP address")
+
+    try {
+      setBanLoading(true);
+      await axios.post(`${process.env.REACT_APP_API_BASE_URL}/ip-blacklist`, { ipAddress: search })
+      alert("Ip banned successfully")
+    } catch (e) {
+      alert(`Error: ${e.message}`)
+    } finally {
+      setBanLoading(false)
+    }
+  } 
 
   return (
     <Container >
@@ -34,8 +49,8 @@ function App() {
       <Box>
         <Flex as="form" onSubmit={onSearch} justifyContent="center" >
           <Input value={search} onChange={(e) => setSearch(e.target.value)} type="text" placeholder="181.167.175.214" mr="2" />
-          <IconButton isLoading={loading} type="submit" aria-label='Search ip data' icon={<SearchIcon />} mr="2" />
-          <Button type="button">Ban IP</Button>
+          <IconButton isLoading={searchLoading} isDisabled={searchLoading || banLoading} type="submit" aria-label='Search ip data' icon={<SearchIcon />} mr="2" />
+          <Button isLoading={banLoading} isDisabled={searchLoading || banLoading} type="button" onClick={onBanIp}>Ban IP</Button>
         </Flex>
       </Box>
       {ipData !== null &&
